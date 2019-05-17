@@ -1,0 +1,52 @@
+body {
+  background-image:url("../images/Telegram.jpg");
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.form-signin{
+  max-width: 330px;
+  padding: 15px;
+  margin:0 auto;
+}
+.codemirror{
+  height : 600px;
+}
+
+#my-video{
+  /* margin-top: 15px;
+  width: 280px;
+  height:auto;
+  background-color: #eee; */
+  width: 100%;
+  height:75%;
+  max-height: 480px;
+  background-color: #eee;
+}
+*,*:before,*after{
+  -moz-box-sizing : border-box;
+  -webkit-box-sizing : border-box;
+  box-sizing: border-box;
+}
+
+#second-video{
+  width: 100%;
+  height:75%;
+  max-height: 480px;
+  background-color: #eee;
+}
+
+#step1-error,#step2,#step3
+{
+  display: none;
+}
+#my-id{
+  font-weight: bold;
+}
+#video-container{
+  text-align: center;
+}

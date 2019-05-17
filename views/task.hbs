@@ -1,0 +1,108 @@
+<br>
+<div class="row">
+  <div class="col-md-8">
+    <textarea id = "codescreen">{{content}}</textarea>
+  </div>
+
+
+  <div class="col-md-4" id="chatbox">
+<!-- VIDEO CALL UI -->
+
+  <br/>
+
+<!-- CHAT ROOM -->
+    <div class="card">
+<!--  ----------------------------------CARD-HEADER------------------------------------------------  -->
+      <div class="card-header bg-success">
+      CHAT ROOM
+      <span class="float-right" id="chatbox-username">
+        {{#if user}}
+          {{user.name}}
+        {{/if}}
+      </span>
+    </div>
+
+<!--  -----------------------------------CARD BODY--------------------------------------------------  -->
+      <div class="card-body">
+        <ul class="media-list" style="height:300px; overflow-y: scroll;" id="chatbox-listMessages">
+        </ul>
+      </div>
+
+<!-- -----------------------------------CARD-FOOTER --------------------------------------------------  -->
+      <div class="card-footer">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Enter message" id="userMessage"/>
+          <span class="input-group-btn">
+              <button type="button" class="btn btn-primary" onclick="sendMessage()">SEND</button>
+          </span>
+        </div>
+      </div>
+
+
+    </div> <!-- Panel Primary-->
+  </div>
+</div>
+
+<input type="hidden" value="{{roomID}}" id="roomID"/>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/mode/javascript/javascript.min.js"></script>
+<script src="/plugin/ot/ot.js"></script>
+<script src="/socket.io/socket.io.js"> </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.1/peer.js"></script>
+
+</script>
+<script>
+var EditorClient = ot.EditorClient;
+var SocketIOAdpater = ot.SocketIOAdpater;
+var CodeMirrorAdapter = ot.CodeMirrorAdapter;
+  var socket = io.connect('http://localhost:3000');
+  var editor = CodeMirror.fromTextArea(document.getElementById('codescreen'),{
+  lineNumbers : true,
+  theme : 'monokai'
+});
+var code = $('codescreen').val();
+
+var cmClient;
+function init(str,revision,clients,serverAdapter){
+  if(!code){
+    editor.setValue(str);
+  }
+  cmClient = window.cmClient = new EditorClient(
+    revision,clients,serverAdapter,new CodeMirrorAdapter(editor)
+  );
+};
+
+socket.on('doc',function(obj){
+  init(obj.str,obj.revision,obj.clients,new ot.SocketIOAdapter(socket));
+});
+
+var username = $("#chatbox-username").val();
+if(username === ""){
+  var userid = Math.floor(Math.random() * 9999).toString();
+  username = "User" + userid;
+  $("#chatbox-username").text(username);
+};
+
+var userMessage = function(name,text){
+  return (
+    '<li class="media"><div class="media-body"><div class="media">' + '<div class="media-body"' + '<b>' + name + '</b> :' + text + '<hr/></div></div></div></li>'
+
+  );
+};
+
+var sendMessage = function(){
+  var userMessage = $("#userMessage").val();
+  socket.emit('chatMessage',{message : userMessage,username : username});
+  $("#userMessage").val("");
+};
+var roomID = $("#roomID").val();
+socket.emit('joinRoom',{room : roomID,username : username});
+
+socket.on('chatMessage',function(data){
+  $("#chatbox-listMessages").append(userMessage(data.username,data.message));
+});
+
+
+
+</script>
